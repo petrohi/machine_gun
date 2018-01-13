@@ -7,8 +7,20 @@ defmodule MachineGun.Mixfile do
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package(),
+      lockfile: "mix.lock",
+      description: "HTTP/1 and HTTP/2 client for Elixir. Based on Gun and Poolboy.",
+      name: "Machine Gun"
     ]
+  end
+
+  defp package do
+    %{
+      licenses: ["ISC License"],
+      maintainers: ["Peter Hizalev"],
+      links: %{"GitHub" => "https://github.com/petrohi/machine_gun"
+    }}
   end
 
   def application do
