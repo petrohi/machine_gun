@@ -1,0 +1,8 @@
+/_build/
+/cover/
+/deps/
+/doc/
+/.fetch
+/.vscode
+erl_crash.dump
+*.ez
