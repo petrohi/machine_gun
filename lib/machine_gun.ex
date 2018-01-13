@@ -90,6 +90,13 @@ defmodule MachineGun do
         else
           path
         end
+        headers = headers
+          |> Enum.map(fn
+            {name, value} when is_integer(value) ->
+              {name, Integer.to_string(value)}
+            {name, value} ->
+              {name, value}
+          end)
         request = %Request{
           method: method,
           path: path,
