@@ -28,47 +28,46 @@ defmodule MachineGun do
   end
 
   def get(url, headers \\ [], opts \\ %{}) do
-    request("GET", url, headers, "", opts)
+    request("GET", url, "", headers, opts)
   end
 
   def post(url, body, headers \\ [], opts \\ %{}) do
-    request("POST", url, headers, body, opts)
+    request("POST", url, body, headers, opts)
   end
 
   def put(url, body, headers \\ [], opts \\ %{}) do
-    request("PUT", url, headers, body, opts)
+    request("PUT", url, body, headers, opts)
   end
 
   def delete(url, headers \\ [], opts \\ %{}) do
-    request("DELETE", url, headers, "", opts)
+    request("DELETE", url, "", headers, opts)
   end
 
   def get!(url, headers \\ [], opts \\ %{}) do
-    request!("GET", url, headers, "", opts)
+    request!("GET", url, "", headers, opts)
   end
 
   def post!(url, body, headers \\ [], opts \\ %{}) do
-    request!("POST", url, headers, body, opts)
+    request!("POST", url, body, headers, opts)
   end
 
   def put!(url, body, headers \\ [], opts \\ %{}) do
-    request!("PUT", url, headers, body, opts)
+    request!("PUT", url, body, headers, opts)
   end
 
   def delete!(url, headers \\ [], opts \\ %{}) do
-    request!("DELETE", url, headers, "", opts)
+    request!("DELETE", url, "", headers, opts)
   end
 
-  def request!(method, url, headers \\ [], body \\ "", opts \\ %{}) do
-    case request(method, url, headers, body, opts) do
+  def request!(method, url, body \\ "", headers \\ [], opts \\ %{}) do
+    case request(method, url, body, headers, opts) do
       {:ok, response} -> response
       {:error, %Error{reason: reason}} -> raise Error, reason: reason
     end
   end
 
-  def request(method, url, headers \\ [], body \\ "", opts \\ %{})
-    when is_binary(method)
-    and is_binary(url)
+  def request(method, url, body \\ "", headers \\ [], opts \\ %{})
+    when is_binary(url)
     and is_list(headers)
     and is_map(opts)  do
     case URI.parse(url) do
@@ -97,6 +96,13 @@ defmodule MachineGun do
             {name, value} ->
               {name, value}
           end)
+        method = case method do
+          :get -> "GET"
+          :post -> "POST"
+          :put -> "PUT"
+          :delete -> "DELETE"
+          s when is_binary(s) -> s
+        end
         request = %Request{
           method: method,
           path: path,
