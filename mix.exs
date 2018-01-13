@@ -10,8 +10,9 @@ defmodule MachineGun.Mixfile do
       deps: deps(),
       package: package(),
       lockfile: "mix.lock",
+      name: "Machine Gun",
       description: "HTTP/1 and HTTP/2 client for Elixir. Based on Gun and Poolboy.",
-      name: "Machine Gun"
+      source_url: "https://github.com/petrohi/machine_gun"
     ]
   end
 
