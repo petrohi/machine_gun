@@ -126,12 +126,14 @@ defmodule MachineGun do
     case r do
       {:ok, transport, protocols} ->
         opts = Application.get_env(:machine_gun, pool_group, %{})
-        opts = opts
+        conn_opts = opts |> Map.get(:conn_opts, %{})
+        conn_opts = conn_opts
           |> Map.merge(%{
             retry: 0,
             http_opts: %{keepalive: :infinity},
             protocols: protocols,
             transport: transport})
+        opts = opts |> Map.merge(%{conn_opts: conn_opts})
         case Supervisor.start(
           pool,
           host,
