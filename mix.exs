@@ -32,9 +32,7 @@ defmodule MachineGun.Mixfile do
 
   defp deps do
     [
-      {:gun,
-        git: "https://github.com/ninenines/gun.git",
-        tag: "b297499e13ce24806cc354ea601292b30cbb979f"},
+      {:gun, "~> 1.0.0-pre.4b"},
       {:poolboy, "~> 1.5"},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
