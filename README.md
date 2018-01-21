@@ -16,8 +16,12 @@ HTTP client for Elixir. Based on [Gun](https://github.com/ninenines/gun) and [Po
 ```
 config :machine_gun,
   default: %{
-    :pool_size => 4,
-    :pool_max_overflow => 4,
-    :pool_timeout => 1000
+    :pool_size => 4,         # Poolboy size [1]
+    :pool_max_overflow => 4, # Poolboy max_overflow [1]
+    :pool_timeout => 1000,
+    :conn_opts => %{}        # Gun connection options [2]
   }
 ```
+
+ 1. https://github.com/devinus/poolboy#options
+ 2. https://ninenines.eu/docs/en/gun/1.0/manual/gun/
