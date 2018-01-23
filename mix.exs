@@ -32,7 +32,7 @@ defmodule MachineGun.Mixfile do
 
   defp deps do
     [
-      {:gun, "~> 1.0.0-pre.4b"},
+      {:gun, "1.0.0-pre.5"},
       {:poolboy, "~> 1.5"},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
