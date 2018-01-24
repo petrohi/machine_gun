@@ -181,10 +181,6 @@ defmodule MachineGun.Worker do
       nil ->
         {:noreply, worker}
       stream_ref ->
-        # :ok = :gun.cancel(gun_pid, stream_ref)
-        # Cancel seems to be broken with crash at :gun_http.handle_head
-        # when subsequent request is made on the same connection. For
-        # now we use :gun.close that terminates the connection abruptly.
         :ok = :gun.close(gun_pid)
         {:noreply, clean_refs(worker, stream_ref, cancel_ref)}
     end
