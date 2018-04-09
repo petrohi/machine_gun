@@ -78,7 +78,8 @@ defmodule MachineGun do
         port: port,
         query: query} when is_binary(host)
         and is_integer(port) ->
-        pool = "#{host}:#{port}" |> String.to_atom()
+        pool_group = opts |> Map.get(:pool_group, :default)
+        pool = "#{pool_group}@#{host}:#{port}" |> String.to_atom()
         path = if path != nil do
           path
         else
@@ -114,8 +115,8 @@ defmodule MachineGun do
           do_request(pool, url, request)
         catch
           :exit, {:noproc, _} ->
-            pool_group = opts |> Map.get(:pool_group, :default)
-            :ok = ensure_pool(pool_group, pool, scheme, host, port)
+            pool_opts = Application.get_env(:machine_gun, pool_group, %{})
+            :ok = ensure_pool(pool, pool_opts, scheme, host, port)
             do_request(pool, url, request)
         end
       _ ->
@@ -123,7 +124,7 @@ defmodule MachineGun do
     end
   end
 
-  defp ensure_pool(pool_group, pool, scheme, host, port) do
+  defp ensure_pool(pool, opts, scheme, host, port) do
     r = case scheme do
       "http"  -> {:ok, :tcp, [:http]}
       "https" -> {:ok, :ssl, [:http2, :http]}
@@ -131,7 +132,6 @@ defmodule MachineGun do
     end
     case r do
       {:ok, transport, protocols} ->
-        opts = Application.get_env(:machine_gun, pool_group, %{})
         conn_opts = opts |> Map.get(:conn_opts, %{})
         conn_opts = %{
           retry: 0,
