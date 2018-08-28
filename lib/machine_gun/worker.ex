@@ -195,7 +195,6 @@ defmodule MachineGun.Worker do
     }, cancel_ref},
     from,
     %Worker{
-      gun_pid: gun_pid,
       streams: streams,
       cancels: cancels
     } = worker) do
