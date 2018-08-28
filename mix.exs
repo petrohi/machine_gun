@@ -4,7 +4,7 @@ defmodule MachineGun.Mixfile do
   def project do
     [
       app: :machine_gun,
-      version: "0.1.1",
+      version: "0.1.2",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
@@ -32,7 +32,7 @@ defmodule MachineGun.Mixfile do
 
   defp deps do
     [
-      {:gun, "~> 1.0"},
+      {:gun, "~> 1.1"},
       {:poolboy, "~> 1.5"},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
