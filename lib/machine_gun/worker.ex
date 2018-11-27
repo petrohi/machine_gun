@@ -176,13 +176,15 @@ defmodule MachineGun.Worker do
 
   def handle_cast(
     {:cancel, cancel_ref},
-    %Worker{gun_pid: gun_pid, cancels: cancels} = worker) do
+    %Worker{gun_pid: gun_pid, gun_ref: gun_ref, cancels: cancels} = worker) do
     case cancels |> Map.get(cancel_ref) do
       nil ->
         {:noreply, worker}
       stream_ref ->
+        worker = clean_refs(worker, stream_ref, cancel_ref)
         :ok = :gun.close(gun_pid)
-        {:noreply, clean_refs(worker, stream_ref, cancel_ref)}
+        true = :erlang.demonitor(gun_ref, [:flush])
+        {:noreply, %{worker | gun_pid: nil, gun_ref: nil}}
     end
   end
 
