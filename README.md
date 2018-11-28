@@ -17,10 +17,10 @@ HTTP client for Elixir. Based on [Gun](https://github.com/ninenines/gun) and [Po
   MachineGun.get!(
     "http://icanhazip.com",
     [{"accept", "text/plain"}],
-    %{request_timeout: 5000, pool_group: :default})
+    %{pool_timeout: 1000, request_timeout: 5000, pool_group: :default})
 ```
 
-(Options are included to show defaults and can be omitted.)
+Options are included to show defaults and can be omitted. `pool_timeout` and `request_timeout` default to values specified in pool group configuration. If not specified in pool group configuration they default to the values in the example.
 
 ## Configuration
 
@@ -31,11 +31,12 @@ config :machine_gun,
     pool_size: 4,         # Poolboy size [1]
     pool_max_overflow: 4, # Poolboy max_overflow [1]
     pool_timeout: 1000,
+    request_timeout: 5000,
     conn_opts: %{}        # Gun connection options [2]
   }
 ```
 
-(Configuration example shows defaults and can be omitted.)
+Configuration example shows defaults and can be omitted. 
 
  1. https://github.com/devinus/poolboy#options
  2. https://ninenines.eu/docs/en/gun/1.0/manual/gun/
