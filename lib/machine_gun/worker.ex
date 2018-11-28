@@ -171,6 +171,10 @@ defmodule MachineGun.Worker do
      )}
   end
 
+  def handle_info(_, worker) do
+    {:noreply, worker}
+  end
+
   def handle_cast(
         {:cancel, cancel_ref},
         %Worker{gun_pid: gun_pid, gun_ref: gun_ref, cancels: cancels} = worker
