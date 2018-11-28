@@ -6,7 +6,7 @@ defmodule MachineGun.Mixfile do
       app: :machine_gun,
       version: "0.1.2",
       elixir: "~> 1.5",
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
       lockfile: "mix.lock",
@@ -20,8 +20,8 @@ defmodule MachineGun.Mixfile do
     %{
       licenses: ["ISC License"],
       maintainers: ["Peter Hizalev"],
-      links: %{"GitHub" => "https://github.com/petrohi/machine_gun"
-    }}
+      links: %{"GitHub" => "https://github.com/petrohi/machine_gun"}
+    }
   end
 
   def application do
@@ -32,7 +32,7 @@ defmodule MachineGun.Mixfile do
 
   defp deps do
     [
-      {:gun, "~> 1.1"},
+      {:gun, "~> 1.3"},
       {:poolboy, "~> 1.5"},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
