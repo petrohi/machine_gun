@@ -117,6 +117,23 @@ defmodule MachineGun do
               {name, value}
           end)
 
+        # Temporary fix for gun issue with content-type
+        # header specified with empty body.
+        #
+        # See:
+        # https://github.com/ninenines/gun/issues/141
+        # 
+        headers =
+          if body === "" do
+            headers
+            |> Enum.reject(fn
+              {"content-type", _} -> true
+              _ -> false
+            end)
+          else
+            headers
+          end
+
         method =
           case method do
             :head -> "HEAD"
