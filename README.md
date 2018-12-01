@@ -1,5 +1,5 @@
-[![Hex.pm version](https://img.shields.io/hexpm/v/lfe.svg)](https://hex.pm/packages/machine_gun)
-[![Hex.pm downloads](https://img.shields.io/hexpm/dt/lfe.svg)](https://hex.pm/packages/machine_gun)
+[![Hex.pm version](https://img.shields.io/hexpm/v/machine_gun.svg)](https://hex.pm/packages/machine_gun)
+[![Hex.pm downloads](https://img.shields.io/hexpm/dt/machine_gun.svg)](https://hex.pm/packages/machine_gun)
 
 # MachineGun
 
@@ -43,6 +43,6 @@ Configuration example shows defaults and can be omitted.
 
 ## Note
 
-When using MachineGun in a long-living process (for example genserver) make sure to handle messages in the form of {ref, _} tuples, which may be produced by pool timeouts [1].
+When using MachineGun in a long-living process (for example genserver) make sure to handle messages in the form of `{ref, _}` tuples, which may be produced by pool timeouts [1].
 
  1. https://hexdocs.pm/elixir/GenServer.html#call/3
