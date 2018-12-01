@@ -31,6 +31,10 @@ defmodule MachineGun do
     def message(%__MODULE__{reason: reason}), do: inspect(reason)
   end
 
+  def head(url, headers \\ [], opts \\ %{}) do
+    request("HEAD", url, "", headers, opts)
+  end
+
   def get(url, headers \\ [], opts \\ %{}) do
     request("GET", url, "", headers, opts)
   end
@@ -45,6 +49,10 @@ defmodule MachineGun do
 
   def delete(url, headers \\ [], opts \\ %{}) do
     request("DELETE", url, "", headers, opts)
+  end
+
+  def head!(url, headers \\ [], opts \\ %{}) do
+    request!("HEAD", url, "", headers, opts)
   end
 
   def get!(url, headers \\ [], opts \\ %{}) do
@@ -111,6 +119,7 @@ defmodule MachineGun do
 
         method =
           case method do
+            :head -> "HEAD"
             :get -> "GET"
             :post -> "POST"
             :put -> "PUT"
