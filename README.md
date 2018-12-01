@@ -40,3 +40,9 @@ Configuration example shows defaults and can be omitted.
 
  1. https://github.com/devinus/poolboy#options
  2. https://ninenines.eu/docs/en/gun/1.0/manual/gun/
+
+## Note
+
+When using MachineGun in a long-living process (for example genserver) make sure to handle messages in the form of {ref, _} tuples, which may be produced by pool timeouts [1].
+
+ 1. https://hexdocs.pm/elixir/GenServer.html#call/3
