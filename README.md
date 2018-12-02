@@ -1,5 +1,6 @@
 [![Hex.pm version](https://img.shields.io/hexpm/v/machine_gun.svg)](https://hex.pm/packages/machine_gun)
 [![Hex.pm downloads](https://img.shields.io/hexpm/dt/machine_gun.svg)](https://hex.pm/packages/machine_gun)
+[![Build Status](https://travis-ci.org/petrohi/machine_gun.svg?branch=master)](https://travis-ci.org/petrohi/machine_gun)
 
 # MachineGun
 
