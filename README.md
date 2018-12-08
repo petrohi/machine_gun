@@ -29,21 +29,18 @@ Options are included to show defaults and can be omitted. `pool_timeout` and `re
 config :machine_gun,
   # Default pool group
   default: %{
-    pool_size: 4,         # Poolboy size [1]
-    pool_max_overflow: 4, # Poolboy max_overflow [1]
+    pool_size: 4,         # Poolboy size
+    pool_max_overflow: 4, # Poolboy max_overflow
     pool_timeout: 1000,
     request_timeout: 5000,
-    conn_opts: %{}        # Gun connection options [2]
+    conn_opts: %{}        # Gun connection options
   }
 ```
 
-Configuration example shows defaults and can be omitted. 
+Configuration example shows defaults and can be omitted. See [Poolboy options](https://github.com/devinus/poolboy#options) documentation for explanation of  `pool_size` and `pool_max_overflow`. See [Gun manual](https://ninenines.eu/docs/en/gun/1.3/manual/gun/) for explanation of `conn_opts`.
 
- 1. https://github.com/devinus/poolboy#options
- 2. https://ninenines.eu/docs/en/gun/1.0/manual/gun/
+## Notes
 
-## Note
-
-When using MachineGun in a long-living process (for example genserver) make sure to handle messages in the form of `{ref, _}` tuples, which may be produced by pool timeouts [1].
-
- 1. https://hexdocs.pm/elixir/GenServer.html#call/3
+* When using MachineGun in a long-living process (for example genserver) make sure to handle messages in the form of `{ref, _}` tuples, which may be produced by pool [timeouts](https://hexdocs.pm/elixir/GenServer.html#call/3-timeouts).
+* When using MachineGun with HTTP/2 and modern HTTP/1 servers we recommend using lowercase header names. For example `content-type`.
+* MachineGun may timeout when request with empty body contains `content-type` header and does not contain `content-length` header. See [this issue](https://github.com/ninenines/gun/issues/141) for details.
