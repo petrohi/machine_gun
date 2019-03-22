@@ -13,7 +13,8 @@ defmodule MachineGun do
       :request_url,
       :status_code,
       :headers,
-      :body
+      :body,
+      :trailers
     ]
   end
 
@@ -87,7 +88,7 @@ defmodule MachineGun do
 
         {transport, protocols} =
           case scheme do
-            "http" -> {:tcp, [:http]}
+            "http" -> {:tcp, [:http2, :http]}
             "https" -> {:ssl, [:http2, :http]}
           end
 

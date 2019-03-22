@@ -158,6 +158,32 @@ defmodule MachineGun.Worker do
   end
 
   def handle_info(
+        {:gun_trailers, gun_pid, stream_ref, trailers},
+        %Worker{
+          gun_pid: gun_pid,
+          streams: streams
+        } = worker
+      ) do
+    case streams |> Map.get(stream_ref) do
+      nil ->
+        {:noreply, worker}
+
+      {from, %Response{} = response, cancel_ref} ->
+        response = %Response{response | trailers: trailers}
+
+        {:noreply,
+         reply_or_continue(
+           worker,
+           stream_ref,
+           :fin,
+           from,
+           response,
+           cancel_ref
+         )}
+    end
+  end
+
+  def handle_info(
         {:DOWN, gun_ref, :process, gun_pid, reason},
         %Worker{
           gun_pid: gun_pid,
