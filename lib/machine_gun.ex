@@ -88,7 +88,7 @@ defmodule MachineGun do
 
         {transport, protocols} =
           case scheme do
-            "http" -> {:tcp, [:http]}
+            "http" -> {:tcp, [:http2, :http]}
             "https" -> {:ssl, [:http2, :http]}
           end
 
