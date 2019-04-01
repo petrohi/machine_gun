@@ -3,6 +3,8 @@ defmodule MachineGun do
 
   alias MachineGun.{Supervisor, Worker}
 
+  require Logger
+
   @default_request_timeout 5000
   @default_pool_timeout 1000
   @default_pool_size 4
@@ -167,6 +169,8 @@ defmodule MachineGun do
                 |> Map.get(:conn_opts, %{})
               )
 
+            Logger.info "Conn_ops before merge: #{inspect conn_opts}"
+
             conn_opts =
               %{
                 retry: 0,
@@ -175,6 +179,8 @@ defmodule MachineGun do
                 transport: transport
               }
               |> Map.merge(conn_opts)
+
+            Logger.info "Conn_ops after merge: #{inspect conn_opts}"
 
             case ensure_pool(pool, host, port, size, max_overflow, conn_opts) do
               :ok ->
