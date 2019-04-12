@@ -13,7 +13,8 @@ defmodule MachineGun do
       :request_url,
       :status_code,
       :headers,
-      :body
+      :body,
+      :trailers
     ]
   end
 
