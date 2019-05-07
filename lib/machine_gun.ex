@@ -161,13 +161,7 @@ defmodule MachineGun do
             size = pool_opts |> Map.get(:pool_size, @default_pool_size)
             max_overflow = pool_opts |> Map.get(:pool_max_overflow, @default_pool_max_overflow)
             strategy = pool_opts |> Map.get(:pool_strategy, @default_pool_strategy)
-            conn_opts =
-              opts
-              |> Map.get(
-                :conn_opts,
-                pool_opts
-                |> Map.get(:conn_opts, %{})
-              )
+            conn_opts = pool_opts |> Map.get(:conn_opts, %{})
 
             conn_opts =
               %{
