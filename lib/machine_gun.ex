@@ -80,7 +80,7 @@ defmodule MachineGun do
   end
 
   def request(method, url, body \\ "", headers \\ [], opts \\ %{})
-      when (is_binary(url) and is_list(headers) and is_map(opts)) or is_list(opts) do
+      when (is_binary(url) and is_list(headers) and is_map(opts)) or is_binary(url) and is_list(headers) and is_list(opts) do
     opts =
       case is_list(opts) do
         true -> Enum.into(opts, %{})
