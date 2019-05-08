@@ -80,7 +80,13 @@ defmodule MachineGun do
   end
 
   def request(method, url, body \\ "", headers \\ [], opts \\ %{})
-      when is_binary(url) and is_list(headers) and is_map(opts) do
+      when (is_binary(url) and is_list(headers) and is_map(opts)) or is_list(opts) do
+    opts =
+      case is_list(opts) do
+        true -> Enum.into(opts, %{})
+        false -> opts
+      end
+
     case URI.parse(url) do
       %URI{scheme: scheme, host: host, path: path, port: port, query: query}
       when is_binary(host) and is_integer(port) and (scheme === "http" or scheme == "https") ->
