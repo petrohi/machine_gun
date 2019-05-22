@@ -7,6 +7,7 @@ defmodule MachineGun do
   @default_pool_timeout 1000
   @default_pool_size 4
   @default_pool_max_overflow 4
+  @default_pool_strategy :lifo
 
   defmodule Response do
     defstruct [
@@ -165,6 +166,7 @@ defmodule MachineGun do
           :exit, {:noproc, _} ->
             size = pool_opts |> Map.get(:pool_size, @default_pool_size)
             max_overflow = pool_opts |> Map.get(:pool_max_overflow, @default_pool_max_overflow)
+            strategy = pool_opts |> Map.get(:pool_strategy, @default_pool_strategy)
             conn_opts = pool_opts |> Map.get(:conn_opts, %{})
 
             conn_opts =
@@ -176,7 +178,7 @@ defmodule MachineGun do
               }
               |> Map.merge(conn_opts)
 
-            case ensure_pool(pool, host, port, size, max_overflow, conn_opts) do
+            case ensure_pool(pool, host, port, size, max_overflow, strategy, conn_opts) do
               :ok ->
                 do_request(pool, url, request, pool_timeout, request_timeout)
 
@@ -193,13 +195,14 @@ defmodule MachineGun do
     end
   end
 
-  defp ensure_pool(pool, host, port, size, max_overflow, conn_opts) do
+  defp ensure_pool(pool, host, port, size, max_overflow, strategy, conn_opts) do
     case Supervisor.start(
            pool,
            host,
            port,
            size,
            max_overflow,
+           strategy,
            conn_opts
          ) do
       {:ok, _} ->
