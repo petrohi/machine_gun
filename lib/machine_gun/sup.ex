@@ -21,7 +21,13 @@ defmodule MachineGun.Supervisor do
 
   def start(name, host, port, size, max_overflow, strategy, conn_opts) do
     Supervisor.start_child(MachineGun.Supervisor, [
-      [name: {:local, name}, worker_module: Worker, size: size, max_overflow: max_overflow, strategy: strategy],
+      [
+        name: {:local, name},
+        worker_module: Worker,
+        size: size,
+        max_overflow: max_overflow,
+        strategy: strategy
+      ],
       [
         host |> String.to_charlist(),
         port,
