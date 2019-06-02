@@ -81,6 +81,13 @@ defmodule MachineGun do
   end
 
   def request(method, url, body \\ "", headers \\ [], opts \\ %{})
+
+  def request(method, url, body, headers, opts)
+      when is_binary(url) and is_list(headers) and is_list(opts) do
+    request(method, url, body, headers, opts |> Map.new())
+  end
+
+  def request(method, url, body, headers, opts)
       when is_binary(url) and is_list(headers) and is_map(opts) do
     case URI.parse(url) do
       %URI{scheme: scheme, host: host, path: path, port: port, query: query}
