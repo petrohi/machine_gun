@@ -3,6 +3,10 @@ defmodule MachineGun do
 
   alias MachineGun.{Supervisor, Worker}
 
+  @type request_headers() :: [Tuple.t(), ...] | []
+  @type request_opts() :: [Tuple.t(), ...] | [] | map
+  @type response_or_error :: {:ok, Response.t()} | {:error, any}
+
   @default_request_timeout 5000
   @default_pool_timeout 1000
   @default_pool_size 4
@@ -33,46 +37,70 @@ defmodule MachineGun do
     def message(%__MODULE__{reason: reason}), do: inspect(reason)
   end
 
+  @callback head(String.t(), request_headers(), request_opts()) :: response_or_error()
+  @spec head(String.t(), request_headers(), request_opts()) :: response_or_error()
   def head(url, headers \\ [], opts \\ %{}) do
     request("HEAD", url, "", headers, opts)
   end
 
+  @callback get(String.t(), request_headers(), request_opts()) :: response_or_error()
+  @spec get(String.t(), request_headers(), request_opts()) :: response_or_error()
   def get(url, headers \\ [], opts \\ %{}) do
     request("GET", url, "", headers, opts)
   end
 
+  @callback post(String.t(), String.t(), request_headers(), request_opts()) :: response_or_error()
+  @spec post(String.t(), String.t(), request_headers(), request_opts()) :: response_or_error()
   def post(url, body, headers \\ [], opts \\ %{}) do
     request("POST", url, body, headers, opts)
   end
 
+  @callback put(String.t(), String.t(), request_headers(), request_opts()) :: response_or_error()
+  @spec put(String.t(), String.t(), request_headers(), request_opts()) :: response_or_error()
   def put(url, body, headers \\ [], opts \\ %{}) do
     request("PUT", url, body, headers, opts)
   end
 
+  @callback delete(String.t(), request_headers(), request_opts()) :: response_or_error()
+  @spec delete(String.t(), request_headers(), request_opts()) :: response_or_error()
   def delete(url, headers \\ [], opts \\ %{}) do
     request("DELETE", url, "", headers, opts)
   end
 
+  @callback head!(String.t(), request_headers(), request_opts()) :: Response.t()
+  @spec head!(String.t(), request_headers(), request_opts()) :: Response.t()
   def head!(url, headers \\ [], opts \\ %{}) do
     request!("HEAD", url, "", headers, opts)
   end
 
+  @callback get!(String.t(), request_headers(), request_opts()) :: Response.t()
+  @spec get!(String.t(), request_headers(), request_opts()) :: Response.t()
   def get!(url, headers \\ [], opts \\ %{}) do
     request!("GET", url, "", headers, opts)
   end
 
+  @callback post!(String.t(), String.t(), request_headers(), request_opts()) :: Response.t()
+  @spec post!(String.t(), String.t(), request_headers(), request_opts()) :: Response.t()
   def post!(url, body, headers \\ [], opts \\ %{}) do
     request!("POST", url, body, headers, opts)
   end
 
+  @callback put!(String.t(), String.t(), request_headers(), request_opts()) :: Response.t()
+  @spec put!(String.t(), String.t(), request_headers(), request_opts()) :: Response.t()
   def put!(url, body, headers \\ [], opts \\ %{}) do
     request!("PUT", url, body, headers, opts)
   end
 
+  @callback delete!(String.t(), request_headers(), request_opts()) :: Response.t()
+  @spec delete!(String.t(), request_headers(), request_opts()) :: Response.t()
   def delete!(url, headers \\ [], opts \\ %{}) do
     request!("DELETE", url, "", headers, opts)
   end
 
+  @callback request!(String.t(), String.t(), String.t(), request_headers(), request_opts()) ::
+              Response.t()
+  @spec request!(String.t(), String.t(), String.t(), request_headers(), request_opts()) ::
+          Response.t()
   def request!(method, url, body \\ "", headers \\ [], opts \\ %{}) do
     case request(method, url, body, headers, opts) do
       {:ok, response} -> response
@@ -80,6 +108,10 @@ defmodule MachineGun do
     end
   end
 
+  @callback request(String.t(), String.t(), String.t(), request_headers(), request_opts()) ::
+              response_or_error()
+  @spec request(String.t(), String.t(), String.t(), request_headers(), request_opts()) ::
+          response_or_error()
   def request(method, url, body \\ "", headers \\ [], opts \\ %{})
 
   def request(method, url, body, headers, opts)
