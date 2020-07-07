@@ -3,36 +3,42 @@ defmodule MachineGun.Supervisor do
 
   alias MachineGun.{Worker}
 
-  use Supervisor
+  use DynamicSupervisor
 
   def start_link([]) do
-    Supervisor.start_link(__MODULE__, [], name: __MODULE__)
+    DynamicSupervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  @impl true
   def init([]) do
-    Supervisor.init(
-      [
-        Supervisor.child_spec(%{start: {:poolboy, :start_link, []}}, restart: :permanent, id: nil)
-      ],
-      strategy: :simple_one_for_one,
-      max_restarts: 10
-    )
+    DynamicSupervisor.init(strategy: :one_for_one, max_restarts: 10)
   end
 
   def start(name, host, port, size, max_overflow, strategy, conn_opts) do
-    Supervisor.start_child(MachineGun.Supervisor, [
-      [
-        name: {:local, name},
-        worker_module: Worker,
-        size: size,
-        max_overflow: max_overflow,
-        strategy: strategy
-      ],
-      [
-        host |> String.to_charlist(),
-        port,
-        conn_opts
-      ]
-    ])
+    DynamicSupervisor.start_child(
+      MachineGun.Supervisor,
+      Supervisor.child_spec(
+        %{
+          start:
+            {:poolboy, :start_link,
+             [
+               [
+                 name: {:local, name},
+                 worker_module: Worker,
+                 size: size,
+                 max_overflow: max_overflow,
+                 strategy: strategy
+               ],
+               [
+                 host |> String.to_charlist(),
+                 port,
+                 conn_opts
+               ]
+             ]}
+        },
+        restart: :permanent,
+        id: nil
+      )
+    )
   end
 end
