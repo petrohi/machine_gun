@@ -15,9 +15,10 @@ HTTP client for Elixir. Based on [Gun](https://github.com/ninenines/gun) and [Po
 
 ```
 %MachineGun.Response{body: body, status_code: 200} =
-  MachineGun.get!(
-    "http://icanhazip.com",
-    [{"accept", "text/plain"}],
+  MachineGun.post!(
+    "https://httpbin.org/anything",
+    "{\"hello\":\"world!\"}",
+    [{"content-type", "application/json"}, {"accept", "application/json"}],
     %{pool_timeout: 1000, request_timeout: 5000, pool_group: :default})
 ```
 
