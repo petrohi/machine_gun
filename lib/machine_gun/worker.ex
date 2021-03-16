@@ -257,7 +257,7 @@ defmodule MachineGun.Worker do
     streams
     |> Map.values()
     |> Enum.each(fn {from, %Response{headers: headers} = response, _} ->
-      case is_last_request(headers) do
+      case last_request?(headers) do
         true -> :ok = GenServer.reply(from, {:ok, response})
         _ -> :ok = GenServer.reply(from, {:error, parse_reason(reason)})
       end
@@ -285,7 +285,7 @@ defmodule MachineGun.Worker do
          %Response{headers: headers} = response,
          cancel_ref
        ) do
-    if is_fin == :fin && !is_last_request(headers) do
+    if is_fin == :fin && !last_request?(headers) do
       :ok = GenServer.reply(from, {:ok, response})
       clean_refs(worker, stream_ref, cancel_ref)
     else
@@ -308,7 +308,7 @@ defmodule MachineGun.Worker do
   def parse_reason({:shutdown, reason}), do: %Error{reason: reason}
   def parse_reason(reason), do: %Error{reason: reason}
 
-  defp is_last_request(headers) do
+  defp last_request?(headers) do
     Enum.any?(headers, fn
       {"connection", v} -> v == "close"
       _ -> false
