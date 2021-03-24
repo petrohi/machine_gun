@@ -279,12 +279,17 @@ defmodule MachineGun.Worker do
          stream_ref,
          is_fin,
          from,
-         response,
+         %Response{headers: headers} = response,
          cancel_ref
        ) do
     if is_fin == :fin do
       :ok = GenServer.reply(from, {:ok, response})
-      clean_refs(worker, stream_ref, cancel_ref)
+      worker = clean_refs(worker, stream_ref, cancel_ref)
+      if last_request?(headers) do
+        close_connection(worker)
+      else
+        worker
+      end
     else
       %{worker | streams: streams |> Map.put(stream_ref, {from, response, cancel_ref})}
     end
@@ -304,4 +309,18 @@ defmodule MachineGun.Worker do
 
   def parse_reason({:shutdown, reason}), do: %Error{reason: reason}
   def parse_reason(reason), do: %Error{reason: reason}
+
+  defp last_request?(headers) do
+    Enum.any?(headers, fn
+      {"connection", v} -> v == "close"
+      _ -> false
+    end)
+  end
+
+  defp close_connection(%Worker{gun_pid: gun_pid, gun_ref: gun_ref} = worker) do
+    :ok = :gun.close(gun_pid)
+    true = :erlang.demonitor(gun_ref, [:flush])
+
+    %{worker | gun_pid: nil, gun_ref: nil} |> reply_error(:closed)
+  end
 end
