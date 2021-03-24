@@ -321,9 +321,6 @@ defmodule MachineGun.Worker do
     :ok = :gun.close(gun_pid)
     true = :erlang.demonitor(gun_ref, [:flush])
 
-    worker
-    |> Map.put(:gun_pid, nil)
-    |> Map.put(:gun_ref, nil)
-    |> reply_error(:normal)
+    %{worker | gun_pid: nil, gun_ref: nil} |> reply_error(:closed)
   end
 end
