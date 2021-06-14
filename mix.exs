@@ -32,6 +32,7 @@ defmodule MachineGun.Mixfile do
 
   defp deps do
     [
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:gun, "~> 1.3"},
       {:poolboy, "~> 1.5"},
       {:ex_doc, ">= 0.0.0", only: :dev}
