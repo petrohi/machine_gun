@@ -256,14 +256,19 @@ defmodule MachineGun do
     m_state = if m_mod != nil, do: m_mod.queued(pool, :poolboy.status(pool), method, path)
 
     try do
-      worker = :poolboy.checkout(pool, pool_queue, pool_timeout)
+      case :poolboy.checkout(pool, pool_queue, pool_timeout) do
+        :full ->
+          {:error, %Error{reason: :pool_full}}
 
-      try do
-        with {:ok, response} <- Worker.request(worker, request, request_timeout, m_mod, m_state) do
-          {:ok, %Response{response | request_url: url}}
-        end
-      after
-        :ok = :poolboy.checkin(pool, worker)
+        worker ->
+          try do
+            with {:ok, response} <-
+                   Worker.request(worker, request, request_timeout, m_mod, m_state) do
+              {:ok, %Response{response | request_url: url}}
+            end
+          after
+            :ok = :poolboy.checkin(pool, worker)
+          end
       end
     catch
       :exit, {:timeout, _} ->
