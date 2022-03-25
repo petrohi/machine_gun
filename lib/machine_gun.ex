@@ -200,6 +200,7 @@ defmodule MachineGun do
                 transport: transport
               }
               |> Map.merge(conn_opts)
+              |> sanitize_transport_opts()
 
             case ensure_pool(pool, host, port, size, max_overflow, strategy, conn_opts) do
               :ok ->
@@ -278,5 +279,16 @@ defmodule MachineGun do
       :exit, {{:shutdown, error}, _} ->
         {:error, %Error{reason: error}}
     end
+  end
+
+  defp sanitize_transport_opts(%{transport: :tcp} = conn_opts) do
+    conn_opts
+    |> Map.update(:transport_opts, [], fn opts ->
+      Keyword.drop(opts, [:verify])
+    end)
+  end
+
+  defp sanitize_transport_opts(conn_opts) do
+    conn_opts
   end
 end
