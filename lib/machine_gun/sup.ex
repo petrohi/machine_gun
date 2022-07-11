@@ -19,7 +19,7 @@ defmodule MachineGun.Supervisor do
       MachineGun.Supervisor,
       Supervisor.child_spec(
         %{
-          id: name,
+          id: nil,
           restart: :permanent,
           start:
             {:poolboy, :start_link,
