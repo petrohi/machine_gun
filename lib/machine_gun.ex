@@ -1,10 +1,10 @@
 defmodule MachineGun do
   @moduledoc ""
 
-  alias MachineGun.{Supervisor, Worker}
+  alias MachineGun.{Supervisor, Worker, Response, Request}
 
-  @type request_headers() :: [Tuple.t(), ...] | []
-  @type request_opts() :: [Tuple.t(), ...] | [] | map
+  @type request_headers() :: [tuple(), ...] | []
+  @type request_opts() :: [tuple(), ...] | [] | map
   @type response_or_error :: {:ok, Response.t()} | {:error, any}
 
   @callback head(String.t(), request_headers(), request_opts()) :: response_or_error()
@@ -36,6 +36,14 @@ defmodule MachineGun do
       :body,
       :trailers
     ]
+
+    @type t :: %__MODULE__{
+            request_url: String.t(),
+            status_code: pos_integer(),
+            headers: map(),
+            body: String.t(),
+            trailers: any()
+          }
   end
 
   defmodule Request do
@@ -45,6 +53,13 @@ defmodule MachineGun do
       :headers,
       :body
     ]
+
+    @type t :: %__MODULE__{
+            method: String.t(),
+            path: String.t(),
+            headers: map(),
+            body: String.t()
+          }
   end
 
   defmodule Error do
@@ -221,7 +236,7 @@ defmodule MachineGun do
             end
         end
 
-      %URI{} ->
+      %URI{scheme: scheme} when is_nil(scheme) or is_binary(scheme) ->
         {:error, %Error{reason: :bad_url_scheme}}
 
       _ ->

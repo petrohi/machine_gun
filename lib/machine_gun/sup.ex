@@ -19,6 +19,8 @@ defmodule MachineGun.Supervisor do
       MachineGun.Supervisor,
       Supervisor.child_spec(
         %{
+          id: name,
+          restart: :permanent,
           start:
             {:poolboy, :start_link,
              [
@@ -30,14 +32,13 @@ defmodule MachineGun.Supervisor do
                  strategy: strategy
                ],
                [
-                 host |> String.to_charlist(),
+                 String.to_charlist(host),
                  port,
                  conn_opts
                ]
              ]}
         },
-        restart: :permanent,
-        id: nil
+        []
       )
     )
   end
