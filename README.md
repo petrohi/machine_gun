@@ -19,10 +19,10 @@ HTTP client for Elixir. Based on [Gun](https://github.com/ninenines/gun) and [Po
     "https://httpbin.org/anything",
     "{\"hello\":\"world!\"}",
     [{"content-type", "application/json"}, {"accept", "application/json"}],
-    %{pool_timeout: 1000, request_timeout: 5000, pool_group: :default})
+    %{pool_queue: true, pool_timeout: 1000, request_timeout: 5000, pool_group: :default})
 ```
 
-Options are included to show defaults and can be omitted. `pool_timeout` and `request_timeout` default to values specified in pool group configuration. If not specified in pool group configuration they default to the values in the example.
+Options are included to show defaults and can be omitted. `pool_queue`, `pool_timeout` and `request_timeout` default to values specified in pool group configuration. If not specified in pool group configuration they default to the values in the example.
 
 ## Configuration
 
@@ -32,6 +32,7 @@ config :machine_gun,
   default: %{
     pool_size: 4,         # Poolboy size
     pool_max_overflow: 4, # Poolboy max_overflow
+    pool_queue: true,     # Queue requests if no workers are available in the pool. If `false` request will fail immediately if all workers are busy
     pool_timeout: 1000,
     request_timeout: 5000,
     conn_opts: %{}        # Gun connection options

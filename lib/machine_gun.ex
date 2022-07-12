@@ -23,6 +23,7 @@ defmodule MachineGun do
               response_or_error()
 
   @default_request_timeout 5000
+  @default_pool_queue true
   @default_pool_timeout 1000
   @default_pool_size 4
   @default_pool_max_overflow 4
@@ -186,21 +187,9 @@ defmodule MachineGun do
 
         pool_opts = Application.get_env(:machine_gun, pool_group, %{})
 
-        pool_timeout =
-          opts
-          |> Map.get(
-            :pool_timeout,
-            pool_opts
-            |> Map.get(:pool_timeout, @default_pool_timeout)
-          )
-
-        request_timeout =
-          opts
-          |> Map.get(
-            :request_timeout,
-            pool_opts
-            |> Map.get(:request_timeout, @default_request_timeout)
-          )
+        pool_queue = get_opt(opts, :pool_queue, pool_opts, @default_pool_queue)
+        pool_timeout = get_opt(opts, :pool_timeout, pool_opts, @default_pool_timeout)
+        request_timeout = get_opt(opts, :request_timeout, pool_opts, @default_request_timeout)
 
         request = %Request{
           method: method,
@@ -210,7 +199,7 @@ defmodule MachineGun do
         }
 
         try do
-          do_request(pool, url, request, pool_timeout, request_timeout)
+          do_request(pool, url, request, pool_queue, pool_timeout, request_timeout)
         catch
           :exit, {:noproc, _} ->
             size = pool_opts |> Map.get(:pool_size, @default_pool_size)
@@ -226,10 +215,11 @@ defmodule MachineGun do
                 transport: transport
               }
               |> Map.merge(conn_opts)
+              |> sanitize_transport_opts()
 
             case ensure_pool(pool, host, port, size, max_overflow, strategy, conn_opts) do
               :ok ->
-                do_request(pool, url, request, pool_timeout, request_timeout)
+                do_request(pool, url, request, pool_queue, pool_timeout, request_timeout)
 
               {:error, error} ->
                 {:error, %Error{reason: error}}
@@ -242,6 +232,11 @@ defmodule MachineGun do
       _ ->
         {:error, %Error{reason: :bad_url}}
     end
+  end
+
+  defp get_opt(opts, key, pool_opts, default) do
+    pool_default = Map.get(pool_opts, key, default)
+    Map.get(opts, key, pool_default)
   end
 
   defp ensure_pool(pool, host, port, size, max_overflow, strategy, conn_opts) do
@@ -269,6 +264,7 @@ defmodule MachineGun do
          pool,
          url,
          %Request{method: method, path: path} = request,
+         pool_queue,
          pool_timeout,
          request_timeout
        ) do
@@ -276,18 +272,19 @@ defmodule MachineGun do
     m_state = if m_mod != nil, do: m_mod.queued(pool, :poolboy.status(pool), method, path)
 
     try do
-      case :poolboy.transaction(
-             pool,
-             fn worker ->
-               Worker.request(worker, request, request_timeout, m_mod, m_state)
-             end,
-             pool_timeout
-           ) do
-        {:ok, response} ->
-          {:ok, %Response{response | request_url: url}}
+      case :poolboy.checkout(pool, pool_queue, pool_timeout) do
+        :full ->
+          {:error, %Error{reason: :pool_full}}
 
-        error ->
-          error
+        worker ->
+          try do
+            with {:ok, response} <-
+                   Worker.request(worker, request, request_timeout, m_mod, m_state) do
+              {:ok, %Response{response | request_url: url}}
+            end
+          after
+            :ok = :poolboy.checkin(pool, worker)
+          end
       end
     catch
       :exit, {:timeout, _} ->
@@ -297,5 +294,16 @@ defmodule MachineGun do
       :exit, {{:shutdown, error}, _} ->
         {:error, %Error{reason: error}}
     end
+  end
+
+  defp sanitize_transport_opts(%{transport: :tcp} = conn_opts) do
+    conn_opts
+    |> Map.update(:transport_opts, [], fn opts ->
+      Keyword.drop(opts, [:verify])
+    end)
+  end
+
+  defp sanitize_transport_opts(conn_opts) do
+    conn_opts
   end
 end
