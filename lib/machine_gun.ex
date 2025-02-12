@@ -216,7 +216,11 @@ defmodule MachineGun do
             size = pool_opts |> Map.get(:pool_size, @default_pool_size)
             max_overflow = pool_opts |> Map.get(:pool_max_overflow, @default_pool_max_overflow)
             strategy = pool_opts |> Map.get(:pool_strategy, @default_pool_strategy)
-            conn_opts = pool_opts |> Map.get(:conn_opts, %{})
+
+            conn_opts =
+              pool_opts
+              |> Map.get(:conn_opts, %{})
+              |> maybe_adjust_transport_opts(transport)
 
             conn_opts =
               %{
@@ -243,6 +247,21 @@ defmodule MachineGun do
         {:error, %Error{reason: :bad_url}}
     end
   end
+
+  defp maybe_adjust_transport_opts(conn_opts, :ssl) do
+    default = MapSet.new(verify: :verify_none)
+
+    transport_opts =
+      conn_opts
+      |> Map.get(:transport_opts, [])
+      |> Enum.into(default)
+      |> MapSet.to_list()
+
+    Map.put(conn_opts, :transport_opts, transport_opts)
+  end
+
+  defp maybe_adjust_transport_opts(conn_opts, _transport),
+    do: conn_opts
 
   defp ensure_pool(pool, host, port, size, max_overflow, strategy, conn_opts) do
     case Supervisor.start(
